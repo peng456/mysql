@@ -92,9 +92,27 @@ from子句==》 where子句 ==》 group by 子句 ===》having子句  ==》 orde
 你好，这是因为在group by 这一步是第一步也是唯一一步可以使用SELECT列表中的列别名的步骤，它不返回有效的表，而是返回一个游标。所以你在having中可以使用 cal 而在where中是不可以使用 cal的，筛选结果的话因为 HAVING cal , 所以显示的 versions 应该都要的。(2年前)举报回复
 
 
-8、根据mysql慢日志监控SQL语句执行效率
+8、根据mysql慢日志监控SQL语句执行效率（https://www.zhangshengrong.com/p/zAaOLMpNdb/）
 
-首先你的mysql必须
+首先你的mysql必须开启这个功能。==》 执行sql : show variables like '%slow%'; 出现如下变量： 
+==》log_slow_admin_statements 、log_slow_slave_statements、slow_launch_time、slow_query_log、slow_query_log_file
+===》slow_query_log 这个默认是 off (关闭的)。slow_query_log_file 慢查询日志存放磁盘位置
+
+或者 到 my.cnf 文件里面配置。然后重启mysql.
+
+
+===》 可以 使用mysql 性能监控工具  Innotop （https://www.zhangshengrong.com/p/YjNK83lXW2/）
+
+
+
+
+
+
+
+
+
+
+
 
 
 
