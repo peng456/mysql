@@ -10,6 +10,26 @@
         可以从一个问题 来理解===》 比如一千万的数据。 他的树高度。（答案一般3层，最高4层）。
         这里面 涉及 很底层的知识。对于小白，这不是一两句能解释清楚的。我有时间在细细解释。
         问题： 一千万的数据，使用索引，问mysql这个B+树 的高度？？？
+ 
+ 索引的分类： 普通索引、唯一索引、主键索引、全文索引（mysql 做的不好，一般用ES等专门软件做全文搜索）
+ 
+ 全文索引
+select * from `student` where match('name') against('聪'); 
+            SELECT * FROM `student` WHERE MATCH(`name`) AGAINST('聪')
+
+5.6版本之后InnoDB存储引擎开始支持全文索引，5.7版本之后通过使用ngram插件开始支持中文。之前仅支持英文，因为是通过空格作为分词的分隔符，对于中文来说是不合适的；MySQL允许在char、varchar、text类型上建立全文索引（https://www.jianshu.com/p/645402711dac）  
+
+不知道现在什么情况了。。。。。。引文MySQL已经到8 了。
+布尔全文搜索
+
+like 是什么呢？是全文索引么？ 显然不是。。。。。
+
+LIKE搜索的耗时随着记录数的增加而线性增长，但对于10万行记录以下的表（这里共100000*50个单词）搜索时间基本上能保持在1秒以内，所以like搜索的性能也不是特别差。由不同词汇量生成的文本对LIKE搜索的性能影响不大，不同词汇量对应的搜索时间基本上在一个很小的时间范围内变化。  
+FULLTEXT搜索耗时也随表中记录数的增长而线性增加。对于10万行记录以下的表（这里共100000*50个单词）搜索时间基本上能保持在0.01秒以内。
+(https://www.cnblogs.com/guifanbiji/p/6202195.html)
+
+ mysql 的 GTID ===> 主从复制更快、MGR 等（https://www.cnblogs.com/f-ck-need-u/p/9164823.html）
+        
 
 3、锁  
       行级锁：
@@ -45,7 +65,7 @@ mysql 默认隔离级别 repeatable read （确实是,我在本机的mysql 上�
     UNLOCK TABLES
   2、应用表锁实现伪事务
 
-5、数据库中会有一个information_schema 的数据。（http://help.wopus.org/mysql-manage/607.html）  
+6、数据库中会有一个information_schema 的数据。（http://help.wopus.org/mysql-manage/607.html）  
 这个库，是mysql自带的。为访问数据库元数据，提供数据。
 在MySQL中，把 information_schema 看作是一个数据库，确切说是信息数据库。其中保存着关于MySQL服务器所维护的所有其他数据库的信息。如数据库名，数据库的表，表栏的数据类型与访问权 限等。  
 INFORMATION_SCHEMA中，有数个只读表。它们实际上是视图，而不是基本表，因此，你将无法看到与之相关的任何文件。  
