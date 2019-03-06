@@ -71,12 +71,30 @@ mysql 默认隔离级别 repeatable read （确实是,我在本机的mysql 上�
 INFORMATION_SCHEMA中，有数个只读表。它们实际上是视图，而不是基本表，因此，你将无法看到与之相关的任何文件。  
 
 
+7、mysql 语句 执行顺序：  
+首先分析mysql 语句定义。就是有哪些固定格式：  
+<SELECT clause> [<FROM clause>] [<WHERE clause>] [<GROUP BY clause>] [<HAVING clause>] [<ORDER BY clause>] [<LIMIT clause>]   
+        
+就是以上了。那么他的执行顺序是什么呢？  
+
+from子句==》 where子句 ==》 group by 子句 ===》having子句  ==》 order by 子句 ===》select 子句 ==》limit 子句 ==》最终结果  
+
+基本就是这个顺序。后一个字句  依赖前一个子句产生的结果。所以中间会有很多中间结果。 如果不存在某个子句，就直接跳过。
+
+参考blog:(https://blog.csdn.net/u014044812/article/details/51004754)
+
+ 
+执行 GROUP BY 子句, 把 tb_Grade 表按 "学生姓名" 列进行分组(注：这一步开始才可以使用select中的别名，他返回的是一个游标，而不是一个表，所以在where中不可以使用select中的别名，而having却可以使用，感谢网友  zyt1369  提出这个问题)
+原文：https://blog.csdn.net/u014044812/article/details/51004754 
+
+经过我查阅资料，关于mysql的update，insert into和delete是不能使用别名的
+
+你好，这是因为在group by 这一步是第一步也是唯一一步可以使用SELECT列表中的列别名的步骤，它不返回有效的表，而是返回一个游标。所以你在having中可以使用 cal 而在where中是不可以使用 cal的，筛选结果的话因为 HAVING cal , 所以显示的 versions 应该都要的。(2年前)举报回复
 
 
+8、根据mysql慢日志监控SQL语句执行效率
 
-
-
-
+首先你的mysql必须
 
 
 
