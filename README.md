@@ -43,8 +43,85 @@ http://www.cnblogs.com/lirunzhou/p/5883711.html
                             SPATIAL关键字(空间索引)
 
 mysql索引类型和索引方法 区别：：
-               索引类型： normal，unique，full text
+               索引类型： normal，unique，full text、Spatial
                索引方法： B-Tree  、 Hash 、R-Tree
+
+（在我的mycat如此显示。FullText、Spatial  没有显示 索引方法）
+normal   ： BTree 、Hash  
+unique   ： BTree 、Hash  
+FullText ：  
+Spatial  ：  
+
+
+CREATE TABLE table_name[col_name data type] [unique|fulltext|spatial][index|key][index_name](col_name[length])[asc|desc]
+
+例子： ALTER TABLE `baskball`.`qz_action` ADD INDEX `nice` USING BTREE (`qz_id`) comment '';
+
+
+
+各种索引的特性 ：https://github.com/wen-fei/MySQLForOptimization  
+
+BTree 索引特点：  
+        以B+树的结构存储数据;
+        能够加快数据的查询速度；
+        更适合进行 “范围查找”  
+        
+ 以下情况可以用到B树索引：  
+         全值匹配查询 ：： 例如order_sn='6767654'查询指定订单号商品
+         最左前缀的查询：：
+         匹配列前缀查询：  比如  order_sn like "676%"  
+         匹配范围查找： 
+         精确匹配左前列 并 范围匹配 另一列  
+ 
+ 其自身限制：
+        非左前缀，==》 无法使用索引  
+        索引时，不能条做中间的列
+        not in   和 <> 不能使用索引
+        如果查询中某个列的范围查找，则其  右边 所有的列 都无法使用索引  ？？？？ select *  from table where a = 1 and  b > 1 and b < 10 and  c = 11 and d =18  
+        其中 c、d 都不能使用索引。
+        
+        
+hash 索引：
+        基于hash的自身实现原理 ==> 只能精确匹配  等值查询  ==》 才能用到hash 
+        实现原理  fun(colmun1,colmun2,colmun3,.....) = hash值。 索引里面存的就是这个hash值。
+ 
+ 限制::   
+        hash 必须二次查找。 索引中的数据结构     fun(colmun1,colmun2,colmun3,.....) = hash值 <==映射==> 指针（应该是主键，主簇索引嘛）（数据的物理地址）
+        所以==》 会全扫 这个 hash 池。但是 基本都在缓存中，速度很快，大部分情况下，对性能影响不大。（也许达到一定级别，会有瓶颈。比如几亿 hash 应该有几个G大。这时候的性能===》 必须重新设计了（上亿url 中查重问题））   
+        hash 索引 无法用于排序（hash 值没法索引）  
+        不支持 部分索引  也不支持 范围索引
+        hash 可能产生冲突 且 不可避免  ；稀疏性小的列不能 进行 hash 索引。
+
+使用索引的原因：
+        减少存储引擎需要扫面的数量
+        可以帮助我们进行排序，以免临时表  
+        索引 可以把 随机索引 ==》 变为顺序索引
+      
+ 索引弊端：
+         增加了写操作的成本
+         太多索引  ==》 会 增加  查询优化器  的选择时间
+         
+
+联合索引：
+        索引顺讯原则：经常使用的列优先
+                    稀疏性高的放左边（状态性的索引不要放左边）
+                    宽度小的列优先（IO小）
+
+
+覆盖索引  ：   （包含了所有需要查询的字段值得索引）  
+                优点：
+                可以优化缓存，减少磁盘IO操作
+                可以减少随机IO，变随机IO操作为顺序IO操作（B树索引可以把随机IO变为顺序IO，顺序IO处理速度更快）
+                可以避免对Innodb逐渐索引的二次查询（二级索引在叶子结点中保存的是行的主键值，查找到相应的主键后，还要通过主键进行二次查询，才能够获取行的数据）
+                可以避免MyISAM表进行系统调用
+
+
+无法使用覆盖索引的情况
+
+存储引擎不支持覆盖索引
+查询中使用了太多的列
+使用了双%号的like查询
+
 
 
  mysql 的 GTID ===> 主从复制更快、MGR 等（https://www.cnblogs.com/f-ck-need-u/p/9164823.html）
